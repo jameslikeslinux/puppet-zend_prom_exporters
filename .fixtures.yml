@@ -5,6 +5,9 @@ fixtures:
   forge_modules:
     inifile: 'puppetlabs/inifile'
     stdlib: 'puppetlabs/stdlib'
+    yumrepo_core: 'puppetlabs/yumrepo_core'
     archive: 'puppet/archive'
+    epel: 'puppet/epel'
     selinux: 'puppet/selinux'
     systemd: 'puppet/systemd'
+    snap: 'rootexpert/snap'

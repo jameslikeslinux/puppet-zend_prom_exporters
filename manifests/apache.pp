@@ -11,6 +11,11 @@ class zend_prom_exporters::apache (
 ) {
   $archive = basename($release_url)
 
+  $user = $facts['os']['family'] ? {
+    'RedHat' => 'apache',
+    'debian' => 'www-data',
+  }
+
   archive { $archive:
     ensure        => present,
     path          => "/var/tmp/${archive}",
@@ -18,15 +23,19 @@ class zend_prom_exporters::apache (
     extract       => true,
     extract_flags => '--exclude LICENSE --strip-components=1 -xf',
     extract_path  => '/usr/local/bin',
-  } ~> systemd::manage_unit { 'apache_exporter.service':
+  } -> file { '/usr/local/bin/apache_exporter':
+    mode  => '0755',
+    owner => 'root',
+    group => 'root',
+  } -> systemd::manage_unit { 'apache_exporter.service':
     unit_entry    => {
       'Description' => 'Apache Prometheus Exporter',
       'Wants'       => 'network-online.target',
       'After'       => 'network-online.target',
     },
     service_entry => {
-      'User'      => 'apache',
-      'Group'     => 'apache',
+      'User'      => $user,
+      'Group'     => $user,
       'Type'      => 'simple',
       'ExecStart' => "/usr/local/bin/apache_exporter --insecure --scrape_uri=http://localhost/server-status/?auto --telemetry.endpoint=/metrics --web.listen-address=:${port}",
     },
@@ -35,6 +44,7 @@ class zend_prom_exporters::apache (
     },
     enable        => true,
     active        => true,
+    subscribe     => Archive[$archive],
   }
 
   if $facts['selinux']['enabled'] {

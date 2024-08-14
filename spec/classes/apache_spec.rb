@@ -28,7 +28,7 @@ describe 'zend_prom_exporters::apache' do
 
       it { is_expected.not_to contain_selinux__fcontext('apache_exporter') }
 
-      context 'systemd enabled' do
+      context 'selinux enabled' do
         let(:facts) do
           os_facts.merge({ 'selinux' => { 'enabled' => true } })
         end

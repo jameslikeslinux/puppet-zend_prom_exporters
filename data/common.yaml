@@ -1,2 +1,3 @@
 ---
 zend_prom_exporters::apache::version: '1.0.8'
+zend_prom_exporters::phpfpm::version: '2.2.0'
